@@ -76,6 +76,7 @@ func NewCompressor(level int, types ...string) *Compressor {
 	allowedWildcards := make(map[string]struct{})
 	if len(types) > 0 {
 		for _, t := range types {
+			t = strings.ToLower(strings.TrimSpace(t))
 			if strings.Contains(strings.TrimSuffix(t, "/*"), "*") {
 				panic(fmt.Sprintf("middleware/compress: Unsupported content-type wildcard pattern '%s'. Only '<type>/*' supported", t))
 			}
@@ -295,6 +296,7 @@ func (cw *compressResponseWriter) isCompressible() bool {
 	// Parse the first part of the Content-Type response header.
 	contentType := cw.Header().Get("Content-Type")
 	contentType, _, _ = strings.Cut(contentType, ";")
+	contentType = strings.ToLower(strings.TrimSpace(contentType))
 
 	// Is the content type compressible?
 	if _, ok := cw.contentTypes[contentType]; ok {

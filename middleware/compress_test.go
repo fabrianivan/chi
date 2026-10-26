@@ -46,6 +46,16 @@ func TestCompressor(t *testing.T) {
 		w.Write([]byte("textstring"))
 	})
 
+	r.Get("/gethtml_case", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "Text/HTML")
+		w.Write([]byte("textstring"))
+	})
+
+	r.Get("/gethtml_whitespace", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "text/html ; charset=utf-8")
+		w.Write([]byte("textstring"))
+	})
+
 	ts := httptest.NewServer(r)
 	defer ts.Close()
 
@@ -91,6 +101,18 @@ func TestCompressor(t *testing.T) {
 			path:              "/getcss",
 			acceptedEncodings: []string{"nop, gzip, deflate"},
 			expectedEncoding:  "nop",
+		},
+		{
+			name:              "case-insensitive content type",
+			path:              "/gethtml_case",
+			acceptedEncodings: []string{"gzip"},
+			expectedEncoding:  "gzip",
+		},
+		{
+			name:              "whitespace before parameter in content type",
+			path:              "/gethtml_whitespace",
+			acceptedEncodings: []string{"gzip"},
+			expectedEncoding:  "gzip",
 		},
 	}
 
